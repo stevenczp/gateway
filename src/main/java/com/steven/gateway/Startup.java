@@ -5,6 +5,7 @@ package com.steven.gateway;
  */
 public class Startup {
     public static void main(String[] args) {
-        System.out.println("hell world");
+        Gateway gateway = new Gateway();
+        gateway.run();
     }
 }
