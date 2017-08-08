@@ -89,16 +89,7 @@ public class RedisCommandDecoder extends ReplayingDecoder<Void> {
      * Send decoded command to next handler
      */
     private void doSendCmdToHandler(List<Object> out) {
-        //        System.out.println("RedisCommandDecoder: Send command to next handler");
-        if (cmds.length == 1) {
-            out.add(new RedisCommand(new String(cmds[0])));
-        } else if (cmds.length == 2) {
-            out.add(new RedisCommand(new String(cmds[0]), cmds[1]));
-        } else if (cmds.length == 3) {
-            out.add(new RedisCommand(new String(cmds[0]), cmds[1], cmds[2]));
-        } else {
-            throw new IllegalStateException("Unknown command");
-        }
+        out.add(new RedisCommand(cmds));
     }
 
     /**

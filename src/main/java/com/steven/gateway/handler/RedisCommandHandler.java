@@ -20,20 +20,22 @@ public class RedisCommandHandler extends SimpleChannelInboundHandler<RedisComman
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RedisCommand msg) throws Exception {
-        //        System.out.println("RedisCommandHandler: " + msg);
-
-        if (msg.getName().equalsIgnoreCase("set")) {
-            database.put(new String(msg.getArg1()), msg.getArg2());
-            ctx.writeAndFlush(SimpleReply.OK_REPLY);
-        } else if (msg.getName().equalsIgnoreCase("get")) {
-            byte[] value = database.get(new String(msg.getArg1()));
-            if (value != null && value.length > 0) {
-                ctx.writeAndFlush(new BulkReply(value));
-            } else {
-                ctx.writeAndFlush(BulkReply.NIL_REPLY);
-            }
-        } else if (msg.getName().equalsIgnoreCase("ping")) {
-            ctx.writeAndFlush(SimpleReply.PONG_REPLY);
+        switch (msg.getName().toLowerCase()) {
+            case "set":
+                database.put(new String(msg.getArg(0)), msg.getArg(1));
+                ctx.writeAndFlush(SimpleReply.OK_REPLY);
+                break;
+            case "get":
+                byte[] value = database.get(new String(msg.getArg(0)));
+                if (value != null && value.length > 0) {
+                    ctx.writeAndFlush(new BulkReply(value));
+                } else {
+                    ctx.writeAndFlush(BulkReply.NIL_REPLY);
+                }
+                break;
+            case "ping":
+                ctx.writeAndFlush(SimpleReply.PONG_REPLY);
+            default:
         }
     }
 
