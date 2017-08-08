@@ -3,6 +3,7 @@ package com.steven.gateway.handler;
 import com.steven.gateway.entity.BulkReply;
 import com.steven.gateway.entity.IntegerReply;
 import com.steven.gateway.entity.RedisCommand;
+import com.steven.gateway.entity.SimpleReply;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
@@ -19,14 +20,11 @@ public class RedisCommandHandler extends SimpleChannelInboundHandler<RedisComman
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RedisCommand msg) throws Exception {
-//        System.out.println("RedisCommandHandler: " + msg);
+        //        System.out.println("RedisCommandHandler: " + msg);
 
         if (msg.getName().equalsIgnoreCase("set")) {
-            if (database.put(new String(msg.getArg1()), msg.getArg2()) == null) {
-                ctx.writeAndFlush(new IntegerReply(1));
-            } else {
-                ctx.writeAndFlush(new IntegerReply(0));
-            }
+            database.put(new String(msg.getArg1()), msg.getArg2());
+            ctx.writeAndFlush(SimpleReply.OK_REPLY);
         } else if (msg.getName().equalsIgnoreCase("get")) {
             byte[] value = database.get(new String(msg.getArg1()));
             if (value != null && value.length > 0) {
@@ -34,6 +32,8 @@ public class RedisCommandHandler extends SimpleChannelInboundHandler<RedisComman
             } else {
                 ctx.writeAndFlush(BulkReply.NIL_REPLY);
             }
+        } else if (msg.getName().equalsIgnoreCase("ping")) {
+            ctx.writeAndFlush(SimpleReply.PONG_REPLY);
         }
     }
 

@@ -18,6 +18,10 @@ public class RedisCommand {
     private byte[] arg1;
     private byte[] arg2;
 
+    public RedisCommand(String name){
+        this.name = name;
+    }
+
     public RedisCommand(String name, byte[] arg1) {
         this.name = name;
         this.arg1 = arg1;

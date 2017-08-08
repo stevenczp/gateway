@@ -24,7 +24,7 @@ public class Gateway {
 
     public void run() {
         logger.info("gateway start... listening port {}", localPort);
-        EventLoopGroup bossGroup = new NioEventLoopGroup(1);
+        EventLoopGroup bossGroup = new NioEventLoopGroup(8);
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
             ServerBootstrap b = new ServerBootstrap();

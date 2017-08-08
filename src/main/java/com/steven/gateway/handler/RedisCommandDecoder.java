@@ -26,7 +26,8 @@ public class RedisCommandDecoder extends ReplayingDecoder<Void> {
      * Decode in block-io style, rather than nio.
      */
     @Override
-    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+    protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out)
+            throws Exception {
         if (cmds == null) {
             if (in.readByte() == '*') {
                 doDecodeNumOfArgs(in);
@@ -47,7 +48,7 @@ public class RedisCommandDecoder extends ReplayingDecoder<Void> {
     private void doDecodeNumOfArgs(ByteBuf in) {
         // Ignore negative case
         int numOfArgs = readInt(in);
-//        System.out.println("RedisCommandDecoder NumOfArgs: " + numOfArgs);
+        //        System.out.println("RedisCommandDecoder NumOfArgs: " + numOfArgs);
         cmds = new byte[numOfArgs][];
 
         checkpoint();
@@ -60,7 +61,7 @@ public class RedisCommandDecoder extends ReplayingDecoder<Void> {
         for (int i = arg; i < cmds.length; i++) {
             if (in.readByte() == '$') {
                 int lenOfBulkStr = readInt(in);
-//                System.out.println("RedisCommandDecoder LenOfBulkStr[" + i + "]: " + lenOfBulkStr);
+                //                System.out.println("RedisCommandDecoder LenOfBulkStr[" + i + "]: " + lenOfBulkStr);
 
                 cmds[i] = new byte[lenOfBulkStr];
                 in.readBytes(cmds[i]);
@@ -77,22 +78,21 @@ public class RedisCommandDecoder extends ReplayingDecoder<Void> {
     }
 
     /**
-     * cmds != null means header decode complete
-     * arg > 0 means arguments decode has begun
-     * arg == cmds.length means complete!
+     * cmds != null means header decode complete arg > 0 means arguments decode has begun arg ==
+     * cmds.length means complete!
      */
     private boolean isComplete() {
-        return (cmds != null)
-                && (arg > 0)
-                && (arg == cmds.length);
+        return (cmds != null) && (arg > 0) && (arg == cmds.length);
     }
 
     /**
      * Send decoded command to next handler
      */
     private void doSendCmdToHandler(List<Object> out) {
-//        System.out.println("RedisCommandDecoder: Send command to next handler");
-        if (cmds.length == 2) {
+        //        System.out.println("RedisCommandDecoder: Send command to next handler");
+        if (cmds.length == 1) {
+            out.add(new RedisCommand(new String(cmds[0])));
+        } else if (cmds.length == 2) {
             out.add(new RedisCommand(new String(cmds[0]), cmds[1]));
         } else if (cmds.length == 3) {
             out.add(new RedisCommand(new String(cmds[0]), cmds[1], cmds[2]));
